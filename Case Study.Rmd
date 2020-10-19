@@ -1,0 +1,96 @@
+---
+title: "Case Study"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(broom)
+library(stringr)
+library(knitr)
+library(nnet)
+library(ggplot2)
+```
+
+## Introduction
+
+### The Data
+
+```{r}
+data <- read.csv("/cloud/project/data/data-train.csv")
+```
+
+
+### Goals
+
+Prediction: For a new parameter setting of (Re, F r, St), predict its particle cluster volume distribution in terms of its four raw moments.
+
+Inference: Investigate and interpret how each parameter affects the probability distribution for particle cluster volumes
+
+## Exploratory Data Analysis
+
+First, we will explore the data to ensure it is fit for modelling and determine inital transformations needed of the data, and which model we see would best fit the data.
+
+```{r}
+names(data)
+summary(data)
+
+```
+
+### Histograms
+
+```{r}
+hist(data$R_moment_1)
+hist(data$R_moment_2)
+hist(data$R_moment_3)
+hist(data$R_moment_4)
+hist(data$Fr, breaks=20)
+hist(data$St, breaks=20)
+hist(data$Re, breaks=20)
+
+
+```
+
+With these histograms its clear to see that each R_moment is heavily right skewed, since there are many rows of 0 in the data. In R_moment_3 and R_moment_4, the maximum values are extremely high whereas the medians are much smaller in comparison, which poses a problem to the analysis. We believe it is best then to apply a transformation to these variables in order to obtain more accurate analysis.
+
+
+```{r}
+hist(log(data$R_moment_1), breaks=20)
+hist(log(data$R_moment_2), breaks=20)
+hist(log(data$R_moment_3), breaks=20)
+hist(log(data$R_moment_4), breaks=20)
+
+```
+
+Performing a log transformation on these variables created more normally distributed variables. While not perfectly normal, this is a big improvement to the non-transformed variables. From here on out, the log version of variables will be used and will be reflected as such in our interpretations and analysis. 
+
+```{r}
+pairs(data)
+```
+It appears that each R_moment variable has somewhat of a linear relationship with St. 
+
+## Initial Modelling
+
+We will fit a basic linear model onto each response variable.
+
+```{r}
+model1 <- lm(log(R_moment_1) ~ St + factor(Re) + factor(Fr), data=data)
+
+summary(model1)
+
+model2 <- lm(log(R_moment_2) ~ St + factor(Re) + factor(Fr), data=data)
+
+summary(model2)
+
+model3 <- lm(log(R_moment_3) ~ St + factor(Re) + factor(Fr), data=data)
+
+summary(model3)
+
+model4 <- lm(log(R_moment_4) ~ St + factor(Re) + factor(Fr), data=data)
+
+summary(model4)
+```
+
+
