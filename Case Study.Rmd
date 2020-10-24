@@ -20,6 +20,7 @@ library(ggplot2)
 
 ```{r}
 data <- read.csv("/cloud/project/data/data-train.csv")
+data
 ```
 
 
@@ -65,6 +66,14 @@ hist(log(data$R_moment_4), breaks=20)
 ```
 
 Performing a log transformation on these variables created more normally distributed variables. While not perfectly normal, this is a big improvement to the non-transformed variables. From here on out, the log version of variables will be used and will be reflected as such in our interpretations and analysis. 
+
+One thing that we should do is turn Fr and Re into ordered, categorical variables, because they only have 2 or 3 unique values each. 
+
+```{r}
+data$Fr <- factor(data$Fr, ordered = TRUE, levels = c(0.052, 0.300, Inf))
+data$Re <- factor(data$Re, ordered=TRUE, levels = c(90, 224, 398))
+```
+
 
 ```{r}
 pairs(data)
