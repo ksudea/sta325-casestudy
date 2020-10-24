@@ -12,6 +12,16 @@ library(stringr)
 library(knitr)
 library(nnet)
 library(ggplot2)
+library(MASS)
+library(ISLR)
+library(leaps)
+install.packages("glmnet", repos = "http://cran.us.r-project.org")
+library(glmnet)
+install.packages("tree", repos = "http://cran.us.r-project.org")
+library(pls)
+install.packages('fastDummies')
+library('fastDummies')
+
 ```
 
 ## Introduction
@@ -102,16 +112,111 @@ model4 <- lm(log(R_moment_4) ~ St + factor(Re) + factor(Fr), data=data)
 summary(model4)
 ```
 
+
+
+
+When all interaction terms are included:
+
+```{r}
+glm.full <- lm(cbind(log(R_moment_1), log(R_moment_2), log(R_moment_3), log(R_moment_4)) ~  (St + factor(Re) + factor(Fr))^2, data=data)
+summary(glm.full)
+```
+# Linear modeling 
+
+Trying stepwise selection
+
+
+```{r}
+regfit.bwd <- regsubsets(log(R_moment_1) ~ (St + factor(Re) + factor(Fr)), data = data, nvmax = 10, method = "forward")
+summary(regfit.bwd)
+#coef(regfit.bwd, which.max(reg.summary.bwd$adjr2))
+```
+
+### Trying to see if adding in dummy columns helps with ridge and lasso regression and so forth. feel free to remove this  
+```{r}
+data <- dummy_cols(data, select_columns = c('Re', 'Fr'))
+drop <- c("Re","Fr")
+data = data[,!(names(data) %in% drop)]
+
+data
+```
+
 # Split data into training and test sets
 ```{r}
+attach(dataf)
 set.seed(3)
-train_ind <- sample(x = nrow(data), size = 0.8 * nrow(data))
+train_ind <- sample(x = nrow(dataf), size = 0.8 * nrow(dataf))
 test_ind_neg <- -train_ind
 training <- data[train_ind, ]
 testing <- data[test_ind_neg, ]
 training
 testing
 ```
+
+# Linear model using least squares
+
+```{r}
+fit.lm1 <- lm(log(R_moment_1) ~ (St + factor(Re) + factor(Fr)), data = training)
+pred.lm1 <- predict(fit.lm1, testing)
+mse_test1 <- mean((pred.lm1 - log(testing$R_moment_1))^2)
+
+fit.lm2 <- lm(log(R_moment_2) ~ (St + factor(Re) + factor(Fr)), data = training)
+pred.lm2 <- predict(fit.lm2, testing)
+mse_test2 <- mean((pred.lm2 - log(testing$R_moment_2))^2)
+
+fit.lm3 <- lm(log(R_moment_3) ~ (St + factor(Re) + factor(Fr)), data = training)
+pred.lm3 <- predict(fit.lm3, testing)
+mse_test3 <- mean((pred.lm3 - log(testing$R_moment_3))^2)
+
+fit.lm4 <- lm(log(R_moment_4) ~ (St + factor(Re) + factor(Fr)), data = training)
+pred.lm4 <- predict(fit.lm4, testing)
+mse_test4 <- mean((pred.lm4 - log(testing$R_moment_4))^2)
+
+mse_test1
+mse_test2
+mse_test3
+mse_test4
+
+```
+ 
+
+Trying ridge regression and getting errors that number of observations in y is not equal to rows of x
+
+
+```{r}
+train.mat <- model.matrix(log(R_moment_3) ~ St + factor(Re) + factor(Fr), data = training)
+test.mat <- model.matrix(log(R_moment_3) ~ St + factor(Re) + factor(Fr), data = testing)
+grid <- 10 ^ seq(4, -2, length = 100)
+fit.ridge <- glmnet(train.mat, log(training$R_moment_3), alpha = 0, lambda = grid, thresh = 1e-12)
+#cv.ridge <- cv.glmnet(train.mat, testing$R_moment_3, alpha = 0, lambda = grid, thresh = 1e-12)
+#bestlam.ridge <- cv.ridge$lambda.min
+#bestlam.ridge
+
+```
+
+Trying PCR model on the 3rd moment:
+
+```{r}
+fit3.pcr <- pcr(log(R_moment_3) ~ (St + factor(Re) + factor(Fr)), data = training, scale = TRUE, validation = "CV")
+validationplot(fit3.pcr, val.type = "MSEP")
+pred3.pcr <- predict(fit3.pcr, testing, ncomp = 5)
+pred3.pcr
+mean((pred3.pcr - log(testing$R_moment_3))^2)
+
+```
+
+Same as least squares
+
+Trying PLS on the 4th moment:
+
+```{r}
+fit4.pls <- plsr(log(R_moment_4) ~ (St + factor(Re) + factor(Fr)), data = training, validation = "CV")
+validationplot(fit4.pls, val.type = "MSEP")
+predict4.pls<-predict(fit4.pls,testing,ncomp=5)
+mean((predict4.pls - log(testing$R_moment_4))^2)
+
+```
+Same as least squares 
 
 # Regression Tree
 ```{r}
@@ -151,6 +256,23 @@ abline(0,1)
 (test_error <- mean((y_hat-moment2_test)^2))
 tss <- mean((testing$R_moment_2 - mean(testing$R_moment_2))^2)
 (rss <- 1 - test_error / tss)
+```
+
+# Random Forest
+```{r}
+library(randomForest)
+set.seed(120)
+rf_mom2 <- randomForest(R_moment_2 ~ St + Re, data = training, ntree = 25,
+                           importance = TRUE)
+summary(rf_mom2)
+
+yhat_rf <- predict(rf_mom2, newdata = testing)
+plot(yhat_rf, moment2_test)
+abline(0,1)
+mean((yhat_rf - moment2_test)^2)
+
+importance(rf_mom2)
+varImpPlot(rf_mom2)
 ```
 
 # Boosting doesn't work
