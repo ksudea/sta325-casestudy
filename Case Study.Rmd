@@ -402,3 +402,392 @@ data_trunc
 #m1 <- zeroinfl(R_moment_4 ~ St + factor(Re) + factor(Fr), data = data_trunc)
 ```
 
+
+## Polynomial Regression
+
+For each of the four moments, we try to fit a polynomial model based on the degree of the numerical variable, St. We also include the other two factored variables in each model.
+
+First moment:
+```{r}
+polym1 <- lm(log(R_moment_1) ~ poly(St, 2) + factor(Re) + factor(Fr), data = training)
+summary(polym1)
+
+poly2m1 <- lm(log(R_moment_1) ~ poly(St, 3) + factor(Re) + factor(Fr), data = training)
+summary(poly2m1)
+
+poly3m1 <- lm(log(R_moment_1) ~ poly(St, 4) + factor(Re) + factor(Fr), data = training)
+summary(poly3m1)
+
+poly4m1 <- lm(log(R_moment_1) ~ poly(St, 5) + factor(Re) + factor(Fr), data = training)
+summary(poly4m1)
+
+poly5m1 <- lm(log(R_moment_1) ~ poly(St, 6) + factor(Re) + factor(Fr), data = training)
+summary(poly5m1)
+
+poly6m1 <- lm(log(R_moment_1) ~ poly(St, 7) + factor(Re) + factor(Fr), data = training)
+summary(poly6m1)
+
+poly7m1 <- lm(log(R_moment_1) ~ poly(St, 8) + factor(Re) + factor(Fr), data = training)
+summary(poly7m1)
+
+
+anova(fit.lm1, polym1, poly2m1, poly3m1, poly4m1, poly5m1, poly6m1, poly7m1)
+
+pred.polym1 <- predict(polym1, testing)
+pred.poly2m1 <- predict(poly2m1, testing)
+pred.poly3m1 <- predict(poly3m1, testing)
+pred.poly4m1 <- predict(poly4m1, testing)
+pred.poly5m1 <- predict(poly5m1, testing)
+pred.poly6m1 <- predict(poly6m1, testing)
+pred.poly7m1 <- predict(poly7m1, testing)
+
+mse_polym1 <- mean((pred.polym1 - log(testing$R_moment_1))^2)
+mse_poly2m1 <- mean((pred.poly2m1 - log(testing$R_moment_1))^2)
+mse_poly3m1 <- mean((pred.poly3m1 - log(testing$R_moment_1))^2)
+mse_poly4m1 <- mean((pred.poly4m1 - log(testing$R_moment_1))^2)
+mse_poly5m1 <- mean((pred.poly5m1 - log(testing$R_moment_1))^2)
+mse_poly6m1 <- mean((pred.poly6m1 - log(testing$R_moment_1))^2)
+mse_poly7m1 <- mean((pred.poly7m1 - log(testing$R_moment_1))^2)
+
+mse_polym1
+mse_poly2m1
+mse_poly3m1
+mse_poly4m1
+mse_poly5m1
+mse_poly6m1
+mse_poly7m1
+```
+Similar to least squares.
+
+Second moment:
+```{r}
+polym2 <- lm(log(R_moment_2) ~ poly(St, 2) + factor(Re) + factor(Fr), data = training)
+summary(polym2)
+
+poly2m2 <- lm(log(R_moment_2) ~ poly(St, 3) + factor(Re) + factor(Fr), data = training)
+summary(poly2m2)
+
+poly3m2 <- lm(log(R_moment_2) ~ poly(St, 4) + factor(Re) + factor(Fr), data = training)
+summary(poly3m2)
+
+poly4m2 <- lm(log(R_moment_2) ~ poly(St, 5) + factor(Re) + factor(Fr), data = training)
+summary(poly4m2)
+
+poly5m2 <- lm(log(R_moment_2) ~ poly(St, 6) + factor(Re) + factor(Fr), data = training)
+summary(poly5m2)
+
+poly6m2 <- lm(log(R_moment_2) ~ poly(St, 7) + factor(Re) + factor(Fr), data = training)
+summary(poly6m2)
+
+poly7m2 <- lm(log(R_moment_2) ~ poly(St, 8) + factor(Re) + factor(Fr), data = training)
+summary(poly7m2)
+
+anova(fit.lm2, polym2, poly2m2, poly3m2, poly4m2, poly5m2, poly6m2, poly7m2)
+
+
+pred.polym2 <- predict(polym2, testing)
+pred.poly2m2 <- predict(poly2m2, testing)
+pred.poly3m2 <- predict(poly3m2, testing)
+pred.poly4m2 <- predict(poly4m2, testing)
+pred.poly5m2 <- predict(poly5m2, testing)
+pred.poly6m2 <- predict(poly6m2, testing)
+pred.poly7m2 <- predict(poly7m2, testing)
+
+
+mse_polym2 <- mean((pred.polym2 - log(testing$R_moment_2))^2)
+mse_poly2m2 <- mean((pred.poly2m2 - log(testing$R_moment_2))^2)
+mse_poly3m2 <- mean((pred.poly3m2 - log(testing$R_moment_2))^2)
+mse_poly4m2 <- mean((pred.poly4m2 - log(testing$R_moment_2))^2)
+mse_poly5m2 <- mean((pred.poly5m2 - log(testing$R_moment_2))^2)
+mse_poly6m2 <- mean((pred.poly6m2 - log(testing$R_moment_2))^2)
+mse_poly7m2 <- mean((pred.poly7m2 - log(testing$R_moment_2))^2)
+
+mse_test2
+mse_polym2
+mse_poly2m2
+mse_poly3m2
+mse_poly4m2
+mse_poly5m2
+mse_poly6m2
+mse_poly7m2
+```
+Same as linear regression? Polynomial model with degree 7 has lowest MSE, but degree 5 or LSR may be better based on ANOVA.
+
+Third moment:
+```{r}
+polym3 <- lm(log(R_moment_3) ~ poly(St, 2) + factor(Re) + factor(Fr), data = training)
+summary(polym3)
+
+poly2m3 <- lm(log(R_moment_3) ~ poly(St, 3) + factor(Re) + factor(Fr), data = training)
+summary(poly2m3)
+
+poly3m3 <- lm(log(R_moment_3) ~ poly(St, 4) + factor(Re) + factor(Fr), data = training)
+summary(poly3m3)
+
+poly4m3 <- lm(log(R_moment_3) ~ poly(St, 5) + factor(Re) + factor(Fr), data = training)
+summary(poly4m3)
+
+poly5m3 <- lm(log(R_moment_3) ~ poly(St, 6) + factor(Re) + factor(Fr), data = training)
+summary(poly5m3)
+
+poly6m3 <- lm(log(R_moment_3) ~ poly(St, 7) + factor(Re) + factor(Fr), data = training)
+summary(poly6m3)
+
+poly7m3 <- lm(log(R_moment_3) ~ poly(St, 8) + factor(Re) + factor(Fr), data = training)
+summary(poly7m3)
+
+poly8m3 <- lm(log(R_moment_3) ~ poly(St, 9) + factor(Re) + factor(Fr), data = training)
+summary(poly8m3)
+
+
+
+anova(fit.lm3, polym3, poly2m3, poly3m3, poly4m3, poly5m3, poly6m3, poly7m3, poly8m3)
+
+pred.polym3 <- predict(polym3, testing)
+pred.poly2m3 <- predict(poly2m3, testing)
+pred.poly3m3 <- predict(poly3m3, testing)
+pred.poly4m3 <- predict(poly4m3, testing)
+pred.poly5m3 <- predict(poly5m3, testing)
+pred.poly6m3 <- predict(poly6m3, testing)
+pred.poly7m3 <- predict(poly7m3, testing)
+pred.poly8m3 <- predict(poly8m3, testing)
+
+
+mse_polym3 <- mean((pred.polym3 - log(testing$R_moment_3))^2)
+mse_poly2m3 <- mean((pred.poly2m3 - log(testing$R_moment_3))^2)
+mse_poly3m3 <- mean((pred.poly3m3 - log(testing$R_moment_3))^2)
+mse_poly4m3 <- mean((pred.poly4m3 - log(testing$R_moment_3))^2)
+mse_poly5m3 <- mean((pred.poly5m3 - log(testing$R_moment_3))^2)
+mse_poly6m3 <- mean((pred.poly6m3 - log(testing$R_moment_3))^2)
+mse_poly7m3 <- mean((pred.poly7m3 - log(testing$R_moment_3))^2)
+mse_poly8m3 <- mean((pred.poly8m3 - log(testing$R_moment_3))^2)
+
+
+mse_test3
+mse_polym3
+mse_poly2m3
+mse_poly3m3
+mse_poly4m3
+mse_poly5m3
+mse_poly6m3
+mse_poly7m3
+mse_poly8m3
+```
+
+Seem to be slightly worse than linear regression. Optimal model in terms of MSE still seems to be Least Squares.
+
+
+Fourth moment:
+```{r}
+polym4 <- lm(log(R_moment_4) ~ poly(St, 2) + factor(Re) + factor(Fr), data = training)
+summary(polym4)
+
+poly2m4 <- lm(log(R_moment_4) ~ poly(St, 3) + factor(Re) + factor(Fr), data = training)
+summary(poly2m4)
+
+poly3m4 <- lm(log(R_moment_4) ~ poly(St, 4) + factor(Re) + factor(Fr), data = training)
+summary(poly3m4)
+
+poly4m4 <- lm(log(R_moment_4) ~ poly(St, 5) + factor(Re) + factor(Fr), data = training)
+summary(poly4m4)
+
+poly5m4 <- lm(log(R_moment_4) ~ poly(St, 6) + factor(Re) + factor(Fr), data = training)
+summary(poly5m4)
+
+poly6m4 <- lm(log(R_moment_4) ~ poly(St, 7) + factor(Re) + factor(Fr), data = training)
+summary(poly6m4)
+
+poly7m4 <- lm(log(R_moment_4) ~ poly(St, 8) + factor(Re) + factor(Fr), data = training)
+summary(poly7m4)
+
+poly8m4 <- lm(log(R_moment_4) ~ poly(St, 8) + factor(Re) + factor(Fr), data = training)
+summary(poly8m4)
+
+
+anova(fit.lm4, polym4, poly2m4, poly3m4, poly4m4, poly5m4, poly6m4, poly7m4, poly8m4)
+
+pred.polym4 <- predict(polym4, testing)
+pred.poly2m4 <- predict(poly2m4, testing)
+pred.poly3m4 <- predict(poly3m4, testing)
+pred.poly4m4 <- predict(poly4m4, testing)
+pred.poly5m4 <- predict(poly5m4, testing)
+pred.poly6m4 <- predict(poly6m4, testing)
+pred.poly7m4 <- predict(poly7m4, testing)
+pred.poly8m4 <- predict(poly8m4, testing)
+
+
+mse_polym4 <- mean((pred.polym4 - log(testing$R_moment_4))^2)
+mse_poly2m4 <- mean((pred.poly2m4 - log(testing$R_moment_4))^2)
+mse_poly3m4 <- mean((pred.poly3m4 - log(testing$R_moment_4))^2)
+mse_poly4m4 <- mean((pred.poly4m4 - log(testing$R_moment_4))^2)
+mse_poly5m4 <- mean((pred.poly5m4 - log(testing$R_moment_4))^2)
+mse_poly6m4 <- mean((pred.poly6m4 - log(testing$R_moment_4))^2)
+mse_poly7m4 <- mean((pred.poly7m4 - log(testing$R_moment_4))^2)
+mse_poly8m4 <- mean((pred.poly8m4 - log(testing$R_moment_4))^2)
+
+
+mse_test4
+mse_polym4
+mse_poly2m4
+mse_poly3m4
+mse_poly4m4
+mse_poly5m4
+mse_poly6m4
+mse_poly7m4
+mse_poly8m4
+```
+The linear regression fit seems to have the minimal MSE for the fourth order.
+
+
+
+### Splines
+```{r}
+library(splines)
+```
+
+
+First moment:
+```{r}
+spline1 <- lm(log(R_moment_1) ~ bs(log(St)) + factor(Re) + factor(Fr), data = training)
+summary(spline1)
+pred.spline1 <- predict(spline1, testing)
+mse_spline1 <- mean((pred.spline1 - log(testing$R_moment_1))^2)
+
+
+spline2 <- lm(log(R_moment_1) ~ bs(log(St), df=4) + factor(Re) + factor(Fr), data = training)
+summary(spline2)
+pred.spline2 <- predict(spline2, testing)
+mse_spline2 <- mean((pred.spline2 - log(testing$R_moment_1))^2)
+
+spline3 <- lm(log(R_moment_1) ~ bs(log(St), df=5) + factor(Re) + factor(Fr), data = training)
+summary(spline3)
+pred.spline3 <- predict(spline3, testing)
+mse_spline3 <- mean((pred.spline3 - log(testing$R_moment_1))^2)
+
+spline4 <- lm(log(R_moment_1) ~ bs(log(St), df=6) + factor(Re) + factor(Fr), data = training)
+summary(spline4)
+pred.spline4 <- predict(spline4, testing)
+mse_spline4 <- mean((pred.spline4 - log(testing$R_moment_1))^2)
+
+spline5 <- lm(log(R_moment_1) ~ bs(log(St), df=7) + factor(Re) + factor(Fr), data = training)
+summary(spline5)
+pred.spline5 <- predict(spline5, testing)
+mse_spline5 <- mean((pred.spline5 - log(testing$R_moment_1))^2)
+
+
+mse_spline1
+mse_spline2
+mse_spline3
+mse_spline4
+mse_spline5
+
+
+```
+
+Second moment:
+```{r}
+spline1m2 <- lm(log(R_moment_2) ~ bs(log(St)) + factor(Re) + factor(Fr), data = training)
+summary(spline1m2)
+pred.spline1m2 <- predict(spline1m2, testing)
+mse_spline1m2 <- mean((pred.spline1m2 - log(testing$R_moment_2))^2)
+
+
+spline2m2 <- lm(log(R_moment_2) ~ bs(log(St), df=4) + factor(Re) + factor(Fr), data = training)
+summary(spline2m2)
+pred.spline2m2 <- predict(spline2m2, testing)
+mse_spline2m2 <- mean((pred.spline2m2 - log(testing$R_moment_2))^2)
+
+spline3m2 <- lm(log(R_moment_2) ~ bs(log(St), df=5) + factor(Re) + factor(Fr), data = training)
+summary(spline3m2)
+pred.spline3m2 <- predict(spline3m2, testing)
+mse_spline3m2 <- mean((pred.spline3m2 - log(testing$R_moment_2))^2)
+
+spline4m2 <- lm(log(R_moment_2) ~ bs(log(St), df=6) + factor(Re) + factor(Fr), data = training)
+summary(spline4m2)
+pred.spline4m2 <- predict(spline4m2, testing)
+mse_spline4m2 <- mean((pred.spline4m2 - log(testing$R_moment_2))^2)
+
+spline5m2 <- lm(log(R_moment_2) ~ bs(log(St), df=7) + factor(Re) + factor(Fr), data = training)
+summary(spline5m2)
+pred.spline5m2 <- predict(spline5m2, testing)
+mse_spline5m2 <- mean((pred.spline5m2 - log(testing$R_moment_2))^2)
+
+mse_spline1m2
+mse_spline2m2
+mse_spline3m2
+mse_spline4m2
+mse_spline5m2
+
+```
+
+Third moment:
+```{r}
+spline1m3 <- lm(log(R_moment_3) ~ bs(log(St)) + factor(Re) + factor(Fr), data = training)
+summary(spline1m3)
+pred.spline1m3 <- predict(spline1m3, testing)
+mse_spline1m3 <- mean((pred.spline1m3 - log(testing$R_moment_3))^2)
+
+
+spline2m3 <- lm(log(R_moment_3) ~ bs(log(St), df=4) + factor(Re) + factor(Fr), data = training)
+summary(spline2m3)
+pred.spline2m3 <- predict(spline2m3, testing)
+mse_spline2m3 <- mean((pred.spline2m3 - log(testing$R_moment_3))^2)
+
+spline3m3 <- lm(log(R_moment_3) ~ bs(log(St), df=5) + factor(Re) + factor(Fr), data = training)
+summary(spline3m3)
+pred.spline3m3 <- predict(spline3m3, testing)
+mse_spline3m3 <- mean((pred.spline3m3 - log(testing$R_moment_3))^2)
+
+spline4m3 <- lm(log(R_moment_3) ~ bs(log(St), df=6) + factor(Re) + factor(Fr), data = training)
+summary(spline4m3)
+pred.spline4m3 <- predict(spline4m3, testing)
+mse_spline4m3 <- mean((pred.spline4m3 - log(testing$R_moment_3))^2)
+
+spline5m3 <- lm(log(R_moment_3) ~ bs(log(St), df=7) + factor(Re) + factor(Fr), data = training)
+summary(spline5m3)
+pred.spline5m3 <- predict(spline5m3, testing)
+mse_spline5m3 <- mean((pred.spline5m3 - log(testing$R_moment_3))^2)
+
+mse_spline1m3
+mse_spline2m3
+mse_spline3m3
+mse_spline4m3
+mse_spline5m3
+
+```
+
+
+Fourth moment:
+```{r}
+spline1m4 <- lm(log(R_moment_4) ~ bs(log(St)) + factor(Re) + factor(Fr), data = training)
+summary(spline1m4)
+pred.spline1m4 <- predict(spline1m4, testing)
+mse_spline1m4 <- mean((pred.spline1m4 - log(testing$R_moment_4))^2)
+
+
+spline2m4 <- lm(log(R_moment_4) ~ bs(log(St), df=4) + factor(Re) + factor(Fr), data = training)
+summary(spline2m4)
+pred.spline2m4 <- predict(spline2m4, testing)
+mse_spline2m4 <- mean((pred.spline2m4 - log(testing$R_moment_4))^2)
+
+spline3m4 <- lm(log(R_moment_4) ~ bs(log(St), df=5) + factor(Re) + factor(Fr), data = training)
+summary(spline3m4)
+pred.spline3m4 <- predict(spline3m4, testing)
+mse_spline3m4 <- mean((pred.spline3m4 - log(testing$R_moment_4))^2)
+
+spline4m4 <- lm(log(R_moment_4) ~ bs(log(St), df=6) + factor(Re) + factor(Fr), data = training)
+summary(spline4m4)
+pred.spline4m4 <- predict(spline4m4, testing)
+mse_spline4m4 <- mean((pred.spline4m4 - log(testing$R_moment_4))^2)
+
+spline5m4 <- lm(log(R_moment_4) ~ bs(log(St), df=7) + factor(Re) + factor(Fr), data = training)
+summary(spline5m4)
+pred.spline5m4 <- predict(spline5m4, testing)
+mse_spline5m4 <- mean((pred.spline5m4 - log(testing$R_moment_4))^2)
+
+mse_spline1m4
+mse_spline2m4
+mse_spline3m4
+mse_spline4m4
+mse_spline5m4
+```
