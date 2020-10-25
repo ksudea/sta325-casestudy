@@ -21,7 +21,7 @@ install.packages("tree", repos = "http://cran.us.r-project.org")
 library(pls)
 install.packages('fastDummies')
 library('fastDummies')
-
+library(mgcv)
 ```
 
 ## Introduction
@@ -79,10 +79,7 @@ Performing a log transformation on these variables created more normally distrib
 
 One thing that we should do is turn Fr and Re into ordered, categorical variables, because they only have 2 or 3 unique values each. 
 
-```{r}
-#data$Fr <- factor(data$Fr, ordered = TRUE, levels = c(0.052, 0.300, Inf))
-#data$Re <- factor(data$Re, ordered=TRUE, levels = c(90, 224, 398))
-```
+
 
 
 ```{r}
@@ -791,3 +788,34 @@ mse_spline3m4
 mse_spline4m4
 mse_spline5m4
 ```
+
+## Generalized Additive Model 
+```{r}
+ftraining <- training
+ftraining$Fr <- factor(ftraining$Fr, ordered = TRUE, levels = c(0.052, 0.300, Inf))
+ftraining$Re <- factor(ftraining$Re, ordered=TRUE, levels = c(90, 224, 398))
+
+
+gam.m1 = gam(R_moment_1 ~ s(St) + Re + Fr, data = ftraining)
+plot(gam.m1)
+summary(gam.m1)
+gam.check(gam.m1)
+
+gam.m2 = gam(R_moment_2 ~ s(St) + Re + Fr, data = ftraining)
+plot(gam.m2)
+summary(gam.m2)
+gam.check(gam.m2)
+
+gam.m3 = gam(R_moment_3 ~ s(St) + Re + Fr, data = ftraining)
+plot(gam.m3)
+summary(gam.m3)
+gam.check(gam.m3)
+
+gam.m4 = gam(R_moment_4 ~ s(St) + Re + Fr, data = ftraining)
+plot(gam.m4)
+summary(gam.m4)
+gam.check(gam.m4)
+```
+
+
+mgcv library takes care of choosing the optimal degrees of freedom for spline models. GAM fitted with a spline on St for each moment. 
