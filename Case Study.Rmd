@@ -22,6 +22,7 @@ library(pls)
 install.packages('fastDummies')
 library('fastDummies')
 library(mgcv)
+library(car)
 ```
 
 ## Introduction
@@ -89,7 +90,7 @@ It appears that each R_moment variable has somewhat of a linear relationship wit
 
 ## Initial Modelling
 
-We will fit a basic linear model onto each response variable.
+We will fit a basic linear model onto each log-transformed response variable.
 
 ```{r}
 model1 <- lm(log(R_moment_1) ~ St + factor(Re) + factor(Fr), data=data)
@@ -110,7 +111,15 @@ summary(model4)
 ```
 
 
+Exploring collinearity:
 
+```{r}
+vif(model1)
+vif(model2)
+vif(model3)
+vif(model4)
+
+```
 
 When all interaction terms are included:
 
@@ -118,25 +127,18 @@ When all interaction terms are included:
 glm.full <- lm(cbind(log(R_moment_1), log(R_moment_2), log(R_moment_3), log(R_moment_4)) ~  (St + factor(Re) + factor(Fr))^2, data=data)
 summary(glm.full)
 ```
-# Linear modeling 
 
-Trying stepwise selection
+Re and Fr seem to have significant interaction for all moments, while St and Re only have significant interaction for the first moment. 
 
+A model with the interaction term for Re and Fr:
 
 ```{r}
-regfit.bwd <- regsubsets(log(R_moment_1) ~ (St + factor(Re) + factor(Fr)), data = data, nvmax = 10, method = "forward")
-summary(regfit.bwd)
-#coef(regfit.bwd, which.max(reg.summary.bwd$adjr2))
+glm.inter <- lm(cbind(log(R_moment_1), log(R_moment_2), log(R_moment_3), log(R_moment_4)) ~  (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data=data)
+summary(glm.inter)
+
 ```
 
-### Trying to see if adding in dummy columns helps with ridge and lasso regression and so forth. feel free to remove this  
-```{r}
-data <- dummy_cols(data, select_columns = c('Re', 'Fr'))
-drop <- c("Re","Fr")
-data = data[,!(names(data) %in% drop)]
-
-data
-```
+Adding the interaction term between Re and Fr improved the fit of the model according to the adjusted R^2 values. 
 
 # Split data into training and test sets
 ```{r}
@@ -150,7 +152,7 @@ training
 testing
 ```
 
-# Linear model using least squares
+# Linear model using least squares & no interaction term 
 
 ```{r}
 fit.lm1 <- lm(log(R_moment_1) ~ (St + factor(Re) + factor(Fr)), data = training)
@@ -175,21 +177,37 @@ mse_test3
 mse_test4
 
 ```
- 
 
-Trying ridge regression and getting errors that number of observations in y is not equal to rows of x
-
+# Linear model using least squares & interaction term
 
 ```{r}
-train.mat <- model.matrix(log(R_moment_3) ~ St + factor(Re) + factor(Fr), data = training)
-test.mat <- model.matrix(log(R_moment_3) ~ St + factor(Re) + factor(Fr), data = testing)
-grid <- 10 ^ seq(4, -2, length = 100)
-fit.ridge <- glmnet(train.mat, log(training$R_moment_3), alpha = 0, lambda = grid, thresh = 1e-12)
-#cv.ridge <- cv.glmnet(train.mat, testing$R_moment_3, alpha = 0, lambda = grid, thresh = 1e-12)
-#bestlam.ridge <- cv.ridge$lambda.min
-#bestlam.ridge
+
+fit.lm1 <- lm(log(R_moment_1) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
+pred.lm1 <- predict(fit.lm1, testing)
+mse_test1 <- mean((pred.lm1 - log(testing$R_moment_1))^2)
+
+fit.lm2 <- lm(log(R_moment_2) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
+pred.lm2 <- predict(fit.lm2, testing)
+mse_test2 <- mean((pred.lm2 - log(testing$R_moment_2))^2)
+
+fit.lm3 <- lm(log(R_moment_3) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
+pred.lm3 <- predict(fit.lm3, testing)
+mse_test3 <- mean((pred.lm3 - log(testing$R_moment_3))^2)
+
+fit.lm4 <- lm(log(R_moment_4) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
+pred.lm4 <- predict(fit.lm4, testing)
+mse_test4 <- mean((pred.lm4 - log(testing$R_moment_4))^2)
+
+mse_test1
+mse_test2
+mse_test3
+mse_test4
 
 ```
+ 
+Having an interaction term significantly improved the test MSEs of the linear model.
+
+
 
 Trying PCR model on the 3rd moment:
 
@@ -197,7 +215,6 @@ Trying PCR model on the 3rd moment:
 fit3.pcr <- pcr(log(R_moment_3) ~ (St + factor(Re) + factor(Fr)), data = training, scale = TRUE, validation = "CV")
 validationplot(fit3.pcr, val.type = "MSEP")
 pred3.pcr <- predict(fit3.pcr, testing, ncomp = 5)
-pred3.pcr
 mean((pred3.pcr - log(testing$R_moment_3))^2)
 
 ```
