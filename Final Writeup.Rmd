@@ -27,8 +27,6 @@ library(mgcv)
 library(car)
 ```
 
-## Introduction
-
 ### The Data
 
 ```{r}
@@ -36,39 +34,8 @@ data <- read.csv("data/data-train.csv")
 ```
 
 
-### Goals
+### Final Model and Predictions
 
-Prediction: For a new parameter setting of (Re, F r, St), predict its particle cluster volume distribution in terms of its four raw moments.
-
-Inference: Investigate and interpret how each parameter affects the probability distribution for particle cluster volumes.
-
-## Methodology
-
-### Linear Modeling 
-Our univariate exploratory data analysis of Re, Fr, St, and each moment revealed that the R_moments are heavily right skewed, which poses a problem to potential linear analysis. We applied log transformations on each moment to obtain more normally distributed variables. The log-transformed R_moments are approximately normal, and it appears that each R_moment variable has somewhat of a linear relationship with St. 
-
-
-```{r}
-pairs(data)
-```
-
-
-Accordingly, we fit a basic linear model onto each log-transformed response variable. While the adjusted R^2 value for R_moment_1 was very high at 0.9949, subsequent moments exibited decreasing adjusted R^2 values, with R_moment_4 having an adjusted R^2 value of 0.6518. We explored multicollinearity through VIFs for each model, which were very low. We also explored the addition of interaction terms to the model. The only interaction term which was significant for all R_moments was the interaction between Re and Fr. Constructing a linear model as such: 
-
-```{r}
-glm.inter <- lm(cbind(log(R_moment_1), log(R_moment_2), log(R_moment_3), log(R_moment_4)) ~  (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data=data)
-summary(glm.inter)
-
-```
-
-Adding the interaction term between Re and Fr improved the fit of the model according to the adjusted R^2 values, which are higher for every moment.  
-
-###Predictive performance of linear modeling
-
-We split data into training and testing sets to evaluate the predictive ability of the models we explored. The linear models with the interaction term for Re and Fr outperformed any other linear model, producing lower test MSEs for every moment of R.
-
-
-# Split data into training and test sets
 ```{r}
 attach(data)
 set.seed(3)
@@ -76,54 +43,75 @@ train_ind <- sample(x = nrow(data), size = 0.8 * nrow(data))
 test_ind_neg <- -train_ind
 training <- data[train_ind, ]
 testing <- data[test_ind_neg, ]
+training
+testing
+ftraining <- training
+ftesting <- testing
+ftraining$Fr <- factor(ftraining$Fr, levels = c(0.052, 0.300, Inf))
+ftraining$Re <- factor(ftraining$Re, levels = c(90, 224, 398))
+ftesting$Fr <- factor(ftesting$Fr, levels = c(0.052, 0.300, Inf))
+ftesting$Re <- factor(ftesting$Re, levels = c(90, 224, 398))
+
+
 ```
 
-
-# Linear model using least squares & interaction term
 
 ```{r}
+fit.lm1 <- lm(log(R_moment_1) ~ (St + Re + Fr + Re*Fr), data = ftraining)
+pred.lm1 <- predict(fit.lm1, ftesting)
+plot(fit.lm1)
+summary(fit.lm1)
 
-fit.lm1 <- lm(log(R_moment_1) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
-pred.lm1 <- predict(fit.lm1, testing)
 mse_test1 <- mean((pred.lm1 - log(testing$R_moment_1))^2)
-
-fit.lm2 <- lm(log(R_moment_2) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
-pred.lm2 <- predict(fit.lm2, testing)
-mse_test2 <- mean((pred.lm2 - log(testing$R_moment_2))^2)
-
-fit.lm3 <- lm(log(R_moment_3) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
-pred.lm3 <- predict(fit.lm3, testing)
-mse_test3 <- mean((pred.lm3 - log(testing$R_moment_3))^2)
-
-fit.lm4 <- lm(log(R_moment_4) ~ (St + factor(Re) + factor(Fr) + factor(Re)*factor(Fr)), data = training)
-pred.lm4 <- predict(fit.lm4, testing)
-mse_test4 <- mean((pred.lm4 - log(testing$R_moment_4))^2)
-
 mse_test1
-mse_test2
-mse_test3
-mse_test4
+
+gam.m2 = gam(log(R_moment_2) ~ s(St) + Re + Fr + St:Re + St:Fr + Re:Fr, data = ftraining)
+plot(gam.m2)
+summary(gam.m2)
+gam.check(gam.m2)
+
+gam.m3 = gam(log(R_moment_3) ~ s(St) + Re + Fr + St:Re + St:Fr + Re:Fr, data = ftraining)
+plot(gam.m3)
+summary(gam.m3)
+gam.check(gam.m3)
+
+gam.m4 = gam(log(R_moment_4) ~ s(St) + Re + Fr + St:Re + St:Fr + Re:Fr, data = ftraining)
+plot(gam.m4)
+summary(gam.m4)
+gam.check(gam.m4)
+
+pred.gam2 <- predict(gam.m2, ftesting)
+pred.gam3 <- predict(gam.m3, ftesting)
+pred.gam4 <- predict(gam.m4, ftesting)
+
+mse_gam2 <- mean((pred.gam2 - log(ftesting$R_moment_2))^2)
+mse_gam3 <- mean((pred.gam3 - log(ftesting$R_moment_3))^2)
+mse_gam4 <- mean((pred.gam4 - log(ftesting$R_moment_4))^2)
+
+mse_gam2
+mse_gam3
+mse_gam4
 
 ```
- 
-Having an interaction term significantly improved the test MSEs of the linear model.
-
-### Other model selection methods 
-
-We applied other model selection methods and nonlinear models such as principle components regression, partial least squares, regression tree, random forest, box cox transformations, and polynomial regressions. The model fits and predictive performances of these models were poor or the same as the linear regression model. 
 
 
-### Splines and GAM
+All predictions:
+
+```{r}
+pred.lm1
+pred.gam2
+pred.gam3
+pred.gam4
+```
 
 
-### Final Model
+Creating a csv of predictions:
 
-Linear model vs gam with splines 
 
-## Results
+```{r}
+dataframe_all <- bind_rows(pred.lm1, pred.gam2, pred.gam3, pred.gam4)
+dataframe_all
+write.csv(dataframe_all,"data/predictions.csv", row.names = FALSE)
 
-### Predictive results of the final model + uncertainties and trade-offs
 
-### Scientific insight
-
-## Conclusion 
+```
