@@ -104,6 +104,54 @@ pred.gam3
 pred.gam4
 ```
 
+<<<<<<< HEAD
+=======
+```{r}
+ftraining <- training
+ftesting <- testing
+ftraining$Fr <- factor(ftraining$Fr, levels = c(0.052, 0.300, Inf))
+ftraining$Re <- factor(ftraining$Re, levels = c(90, 224, 398))
+ftesting$Fr <- factor(ftesting$Fr, levels = c(0.052, 0.300, Inf))
+ftesting$Re <- factor(ftesting$Re, levels = c(90, 224, 398))
+
+gam.m1 = gam(log(R_moment_1) ~ s(St) + Re + Fr + St:Re + St: Fr + Re:Fr, data = ftraining)
+plot(gam.m1)
+summary(gam.m1)
+gam.check(gam.m1)
+
+gam.m2 = gam(log(R_moment_2) ~ s(St) + Re + Fr + St:Re + St:Fr + Re:Fr, data = ftraining)
+plot(gam.m2)
+summary(gam.m2)
+gam.check(gam.m2)
+
+gam.m3 = gam(log(R_moment_3) ~ s(St) + Re + Fr + St:Re + St:Fr + Re:Fr, data = ftraining)
+plot(gam.m3)
+summary(gam.m3)
+gam.check(gam.m3)
+
+gam.m4 = gam(log(R_moment_4) ~ s(St) + Re + Fr + St:Re + St:Fr + Re:Fr, data = ftraining)
+plot(gam.m4)
+summary(gam.m4)
+gam.check(gam.m4)
+
+pred.gam1 <- predict(gam.m1, ftesting)
+pred.gam2 <- predict(gam.m2, ftesting)
+pred.gam3 <- predict(gam.m3, ftesting)
+pred.gam4 <- predict(gam.m4, ftesting)
+
+mse_gam1 <- mean((pred.gam1 - log(ftesting$R_moment_1))^2)
+mse_gam2 <- mean((pred.gam2 - log(ftesting$R_moment_2))^2)
+mse_gam3 <- mean((pred.gam3 - log(ftesting$R_moment_3))^2)
+mse_gam4 <- mean((pred.gam4 - log(ftesting$R_moment_4))^2)
+
+mse_gam1
+mse_gam2
+mse_gam3
+mse_gam4
+```
+
+### Final Model
+>>>>>>> 6b49e611164cfe92b2e104051e6236aa76c55b9c
 
 Creating a csv of predictions:
 

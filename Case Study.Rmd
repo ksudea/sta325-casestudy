@@ -866,6 +866,7 @@ ftraining$Fr <- factor(ftraining$Fr, levels = c(0.052, 0.300, Inf))
 ftraining$Re <- factor(ftraining$Re, levels = c(90, 224, 398))
 ftesting$Fr <- factor(ftesting$Fr, levels = c(0.052, 0.300, Inf))
 ftesting$Re <- factor(ftesting$Re, levels = c(90, 224, 398))
+<<<<<<< HEAD
 ```
 
 
@@ -881,6 +882,9 @@ mse_test1
 ```
 
 ```{r}
+=======
+
+>>>>>>> 6b49e611164cfe92b2e104051e6236aa76c55b9c
 gam.m1 = gam(log(R_moment_1) ~ s(St) + Re + Fr + St:Re + St: Fr + Re:Fr, data = ftraining)
 plot(gam.m1)
 summary(gam.m1)
