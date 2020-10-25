@@ -95,21 +95,31 @@ mse_gam4
 ```
 
 
-All predictions:
-
+### Predictions on the Test Data
 ```{r}
-pred.lm1
-pred.gam2
-pred.gam3
-pred.gam4
+datat <- read.csv("data/data-test.csv")
+datat$Fr <- factor(datat$Fr, levels = c(0.052, 0.300, Inf))
+datat$Re <- factor(datat$Re, levels = c(90, 224, 398))
+
 ```
 
+```{r}
+
+predt.lm1 <- predict(fit.lm1, datat)
+predt.gam2 <- predict(gam.m2, datat)
+predt.gam3 <- predict(gam.m3, datat)
+predt.gam4 <- predict(gam.m4, datat)
+
+```
+
+### Prediction Consolidation
 
 Creating a csv of predictions:
 
 
 ```{r}
-dataframe_all <- bind_rows(pred.lm1, pred.gam2, pred.gam3, pred.gam4)
+dataframe_all <- bind_rows(predt.lm1, predt.gam2, predt.gam3, predt.gam4)
+dataframe_all <- exp(dataframe_all)
 dataframe_all
 write.csv(dataframe_all,"data/predictions.csv", row.names = FALSE)
 
