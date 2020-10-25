@@ -232,6 +232,7 @@ moment1_test <- testing[,"R_moment_1"]
 plot(y_hat, moment1_test)
 abline(0,1)
 test_error <- mean((y_hat-moment1_test)^2)
+test_error
 tss <- mean((testing$R_moment_1 - mean(testing$R_moment_1))^2)
 (rss <- 1 - test_error / tss)
 ```
@@ -251,6 +252,7 @@ moment2_test <- testing[,"R_moment_2"]
 plot(y_hat, moment2_test)
 abline(0,1)
 (test_error <- mean((y_hat-moment2_test)^2))
+test_error
 tss <- mean((testing$R_moment_2 - mean(testing$R_moment_2))^2)
 (rss <- 1 - test_error / tss)
 ```
@@ -792,9 +794,11 @@ mse_spline5m4
 ## Generalized Additive Model 
 ```{r}
 ftraining <- training
+ftesting <- testing
 ftraining$Fr <- factor(ftraining$Fr, ordered = TRUE, levels = c(0.052, 0.300, Inf))
 ftraining$Re <- factor(ftraining$Re, ordered=TRUE, levels = c(90, 224, 398))
-
+ftesting$Fr <- factor(ftesting$Fr, ordered = TRUE, levels = c(0.052, 0.300, Inf))
+ftesting$Re <- factor(ftesting$Re, ordered=TRUE, levels = c(90, 224, 398))
 
 gam.m1 = gam(R_moment_1 ~ s(St) + Re + Fr, data = ftraining)
 plot(gam.m1)
@@ -815,6 +819,22 @@ gam.m4 = gam(R_moment_4 ~ s(St) + Re + Fr, data = ftraining)
 plot(gam.m4)
 summary(gam.m4)
 gam.check(gam.m4)
+
+#pred.gam1 <- predict(gam.m1, ftesting)
+#pred.gam2 <- predict(gam.m2, ftesting)
+#pred.gam3 <- predict(gam.m3, ftesting)
+#pred.gam4 <- predict(gam.m4, ftesting)
+
+#mse_gam1 <- mean((pred.gam1 - ftesting$R_moment_1)^2)
+#mse_gam2 <- mean((pred.gam2 - ftesting$R_moment_2)^2)
+#mse_gam3 <- mean((pred.gam3 - ftesting$R_moment_3)^2)
+#mse_gam4 <- mean((pred.gam4 - ftesting$R_moment_4)^2)
+
+#mse_gam1
+#mse_gam2
+#mse_gam3
+#mse_gam4
+
 ```
 
 
