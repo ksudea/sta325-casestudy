@@ -672,14 +672,6 @@ datat$Re <- factor(datat$Re, levels = c(90, 224, 398))
 
 ```
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 0876929e6baca1821fce81555debda29e03c24d6
->>>>>>> 23bda2f8d40d0f1915d8720dc0f4dcc32f20b921
 ```{r}
 
 predt.lm1 <- predict(fit.lm1, datat)
@@ -689,25 +681,14 @@ predt.gam4 <- predict(gam.m4, datat)
 
 ```
 
-<<<<<<< HEAD
-### Prediction Consolidation
-=======
-<<<<<<< HEAD
-### Prediction Consolidation
-=======
-### Final Model
->>>>>>> 6b49e611164cfe92b2e104051e6236aa76c55b9c
->>>>>>> 0876929e6baca1821fce81555debda29e03c24d6
->>>>>>> 23bda2f8d40d0f1915d8720dc0f4dcc32f20b921
-
 Creating a csv of predictions:
 
 
 ```{r}
-dataframe_all <- bind_rows(predt.lm1, predt.gam2, predt.gam3, predt.gam4)
-dataframe_all <- exp(dataframe_all)
+dataframe_all <- cbind(exp(predt.lm1), exp(predt.gam2), exp(predt.gam3), exp(predt.gam4))
+
+write.csv(dataframe_all,"data/predictionsfinal.csv", row.names = FALSE)
 dataframe_all
-write.csv(dataframe_all,"data/predictions.csv", row.names = FALSE)
 
 
 ```
