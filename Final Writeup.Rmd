@@ -103,6 +103,11 @@ datat$Re <- factor(datat$Re, levels = c(90, 224, 398))
 
 ```
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 0876929e6baca1821fce81555debda29e03c24d6
 ```{r}
 
 predt.lm1 <- predict(fit.lm1, datat)
@@ -112,7 +117,12 @@ predt.gam4 <- predict(gam.m4, datat)
 
 ```
 
+<<<<<<< HEAD
 ### Prediction Consolidation
+=======
+### Final Model
+>>>>>>> 6b49e611164cfe92b2e104051e6236aa76c55b9c
+>>>>>>> 0876929e6baca1821fce81555debda29e03c24d6
 
 Creating a csv of predictions:
 
